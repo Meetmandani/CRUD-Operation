@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CRUD with Local Storage</title>
+</head>
+<body>
+  <h1>CRUD Operations with Local Storage</h1>
+
+  
+  <form id="crudForm">
+    <input type="hidden" id="index" value="">
+    <input type="text" id="name" placeholder="Enter name" required>
+    <button type="submit">Save</button>
+  </form>
+
+  
+  <ul id="dataList"></ul>
+
+  <script>
+    
+    const STORAGE_KEY = 'crudData';
+
+   
+    const form = document.getElementById('crudForm');
+    const nameInput = document.getElementById('name');
+    const indexInput = document.getElementById('index');
+    const dataList = document.getElementById('dataList');
+
+    
+    function loadData() {
+      const data = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+      renderList(data);
+    }
+
+    
+    function renderList(data) {
+      dataList.innerHTML = ''; 
+      data.forEach((item, idx) => {
+        const li = document.createElement('li');
+        li.textContent = item;
+
+        
+        const editBtn = document.createElement('button');
+        editBtn.textContent = 'Edit';
+        editBtn.onclick = () => editData(idx);
+
+        
+        const deleteBtn = document.createElement('button');
+        deleteBtn.textContent = 'Delete';
+        deleteBtn.onclick = () => deleteData(idx);
+
+        li.appendChild(editBtn);
+        li.appendChild(deleteBtn);
+        dataList.appendChild(li);
+      });
+    }
+
+    
+    function saveData(event) 
+    {
+      event.preventDefault();
+      const name = nameInput.value.trim();
+      const index = indexInput.value;
+
+      if (!name) return;
+
+      const data = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+
+      if (index === '') 
+      {
+        
+        data.push(name);
+      } else {
+        
+        data[parseInt(index)] = name;
+      }
+
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      loadData();
+      form.reset(); 
+    }
+
+    
+    function editData(index)
+     {
+      const data = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+      nameInput.value = data[index];
+      indexInput.value = index;
+    }
+
+    
+    function deleteData(index) 
+    {
+      const data = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+      data.splice(index, 1);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      loadData();
+    }
+
+    
+    form.addEventListener('submit', saveData);
+
+    
+    loadData();
+  </script>
+</body>
+</html>
